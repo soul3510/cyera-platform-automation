@@ -80,22 +80,30 @@ test.describe('Alert Life Cycle - Auto-Remediation and Rescan Verification', () 
       logger.info('Rescan completed');
     });
 
-    await test.step('Verify identical alert was not recreated', async () => {
-      logger.info(`Checking for identical alerts recreated from ${originalAlert.id}`);
+await test.step('Verify identical alert was not recreated', async () => {
+  logger.info(`Checking for identical alerts recreated from ${originalAlert.id}`);
 
-      const identicalAlerts = await alertsApi.findIdenticalAlerts(originalAlert);
+  const identicalAlerts = await alertsApi.findIdenticalAlerts(originalAlert);
 
-      logger.info(
-        `Identical recreated alerts found: ${identicalAlerts.map(alert => alert.id).join(', ') || 'none'}`
-      );
+  logger.info(
+    `Identical recreated alerts found: ${
+      identicalAlerts.map(alert => alert.id).join(', ') || 'none'
+    }`
+  );
 
-      // This assertion is expected to fail by assignment design.
-      expect(
-        identicalAlerts,
-        `Expected no identical alert to be recreated, but found: ${identicalAlerts
-          .map(alert => alert.id)
-          .join(', ')}`
-      ).toHaveLength(0);
-    });
+  //If identical alert is recreated → assertion fails → Playwright marks it as expected failure.
+  //If identical alert is NOT recreated → assertion passes → Playwright fails the test because it was expected to fail.
+  test.fail(
+    true,
+    'Expected failure: the system intentionally recreates the same alert after rescan.'
+  );
+
+  expect(
+    identicalAlerts,
+    `Expected no identical alert to be recreated, but found: ${identicalAlerts
+      .map(alert => alert.id)
+      .join(', ')}`
+  ).toHaveLength(0);
+});
   });
 });

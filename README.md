@@ -181,3 +181,15 @@ See [Port Conflicts](#port-conflicts) section above.
 | --------------------------------------------------- | --------------------- |
 | [Docker Commands](docs/docker-commands.md)          | Full Docker reference |
 | [Alert Status Flow](docs/alert-status-flowchart.md) | Status transitions    |
+
+
+
+
+//TODO: 
+How to install dependencies
+How to run UI tests
+How to run API tests
+How to view reports
+Expected failure explanation
+Project structure
+Design decisions

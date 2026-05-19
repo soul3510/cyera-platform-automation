@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "Mock DSPM Portal for automation testing",
   "scripts": {
-  "test": "npx playwright test",
-  "test:ui": "npx playwright test tests/ui",
-  "test:api": "npx playwright test tests/api",
-  "test:headed": "npx playwright test tests/ui --headed",
-  "test:debug": "npx playwright test tests/ui --debug",
+  "test": "npx playwright test --workers=1",
+  "test:ui": "npx playwright test tests/ui --workers=1",
+  "test:api": "npx playwright test tests/api --workers=1",
+  "test:headed": "npx playwright test tests/ui --headed --workers=1",
+  "test:debug": "npx playwright test tests/ui --debug --workers=1",
   "test:pw-ui": "npx playwright test --ui",
   "test:report": "npx playwright show-report"
 },
