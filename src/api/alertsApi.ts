@@ -3,8 +3,14 @@ import { ApiClient } from './apiClient';
 
 export type Alert = {
   id: string;
+  runId?: string;
+  policyId?: string;
+  policyName?: string;
   status: string;
+  assetId?: string;
   assetDisplayName?: string;
+  assetLocation?: string;
+  violationType?: string;
   remediation?: {
     autoRemediate?: boolean;
     note?: string;
@@ -75,6 +81,60 @@ async waitForStatus(
 
   throw new Error(
     `Alert ${alertId} did not reach status ${expectedStatus} within ${timeoutMs}ms. Last status was: ${lastStatus}`
+  );
+}
+
+async findAutoRemediationAlert(): Promise<Alert> {
+  // Find an alert that matches the auto-remediation flow requirements.
+  const alerts = await this.getAlerts();
+
+  const alert = alerts.find(
+    item =>
+      item.remediation?.autoRemediate === true &&
+      ['OPEN', 'REMEDIATION_IN_PROGRESS', 'REMEDIATED_WAITING_FOR_CUSTOMER'].includes(item.status)
+  );
+
+  expect(alert, 'No alert with Auto Remediate ON was found').toBeTruthy();
+
+  return alert!;
+}
+
+async updateStatus(alertId: string, status: string): Promise<Alert> {
+  // Update alert lifecycle status through the backend API.
+  const response = await this.api.patch(`/alerts/${alertId}`, {
+    status,
+  });
+
+  expect(
+    response.ok(),
+    `Failed to update alert ${alertId} status to ${status}. Status: ${response.status()}`
+  ).toBeTruthy();
+
+  return response.json();
+}
+
+async addComment(alertId: string, message: string): Promise<void> {
+  // Add a user verification comment to the alert.
+  const response = await this.api.post(`/alerts/${alertId}/comments`, {
+    message,
+  });
+
+  expect(
+    response.ok(),
+    `Failed to add comment to alert ${alertId}. Status: ${response.status()}`
+  ).toBeTruthy();
+}
+
+async findIdenticalAlerts(originalAlert: Alert): Promise<Alert[]> {
+  // Identify alerts that represent the same issue after a rescan.
+  // We intentionally ignore ID and runId because recreated alerts receive new values.
+  const alerts = await this.getAlerts();
+
+  return alerts.filter(candidate =>
+    candidate.id !== originalAlert.id &&
+    candidate.policyId === originalAlert.policyId &&
+    candidate.assetId === originalAlert.assetId &&
+    candidate.violationType === originalAlert.violationType
   );
 }
 }
