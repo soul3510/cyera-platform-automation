@@ -4,6 +4,7 @@ import { ApiClient } from './apiClient';
 export type Alert = {
   id: string;
   status: string;
+  assetDisplayName?: string;
   remediation?: {
     autoRemediate?: boolean;
     note?: string;
@@ -49,20 +50,31 @@ export class AlertsApi {
     return alert!;
   }
 
-  async waitForStatus(alertId: string, expectedStatus: string, timeoutMs = 30000): Promise<Alert> {
-    //poll the alert until BE finish processing the alert and update its status to the expected status, or until timeout.
-    const startedAt = Date.now();
+async waitForStatus(
+  alertId: string,
+  expectedStatus: string,
+  timeoutMs = 30000
+): Promise<Alert> {
+  const startedAt = Date.now();
+  let lastStatus = 'UNKNOWN';
 
-    while (Date.now() - startedAt < timeoutMs) {
-      const alert = await this.getAlert(alertId);
+  while (Date.now() - startedAt < timeoutMs) {
+    const alert = await this.getAlert(alertId);
+    lastStatus = alert.status;
 
-      if (alert.status === expectedStatus) {
-        return alert;
-      }
+    console.log(
+      `[INFO] Alert ${alertId} current status: ${alert.status}`
+    );
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    if (alert.status === expectedStatus) {
+      return alert;
     }
 
-    throw new Error(`Alert ${alertId} did not reach status ${expectedStatus} within ${timeoutMs}ms`);
+    await new Promise(resolve => setTimeout(resolve, 10000));
   }
+
+  throw new Error(
+    `Alert ${alertId} did not reach status ${expectedStatus} within ${timeoutMs}ms. Last status was: ${lastStatus}`
+  );
+}
 }
