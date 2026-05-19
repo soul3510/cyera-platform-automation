@@ -7,6 +7,7 @@ import { ApiClient } from './apiClient';
  */
 
 export class AdminApi {
+//gives the apiClient.ts to own the authentication token with setAuthToken() so that all other ts files will reuse the same auth token and will not have to re authenticate each time. 
   constructor(private readonly api: ApiClient) {}
 
   async resetData(): Promise<void> {
