@@ -40,7 +40,7 @@ curl http://localhost:3000
 
 | Username | Password |
 | -------- | -------- |
-| admin    | Aa123456 |
+| admin    | {See Assignment Doc} |
 
 ---
 
@@ -255,7 +255,7 @@ Required variables:
 WEB_BASE_URL=http://localhost:3000
 API_BASE_URL=http://localhost:8080/api
 E2E_USERNAME=admin
-E2E_PASSWORD=Aa123456
+E2E_PASSWORD= {See Assignment Doc}
 ```
 
 | Variable | Description |
